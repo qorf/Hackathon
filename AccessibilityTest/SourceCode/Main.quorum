@@ -1,0 +1,291 @@
+use Libraries.Game.Game
+use Libraries.Game.Graphics.Color
+use Libraries.Interface.Controls.MenuBar
+use Libraries.Interface.Controls.MenuItem
+use Libraries.Interface.Controls.ToolBar
+use Libraries.Interface.Controls.Button
+use Libraries.Interface.Controls.TabPane
+use Libraries.Interface.Controls.Tab
+use Libraries.Interface.Controls.Tree
+use Libraries.Interface.Controls.TreeItem
+use Libraries.Interface.Controls.List
+use Libraries.Interface.Controls.TextBox
+use Libraries.Interface.Controls.OptionDialog
+use Libraries.Interface.Layouts.FlowLayout
+use Libraries.Interface.Layouts.LayoutProperties
+use Libraries.Interface.Controls.Icon
+use Libraries.Game.InputSet
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Containers.Array
+use Libraries.Game.Graphics.Model
+use Libraries.Game.Graphics.AmbientLight
+use Libraries.Game.Graphics.DirectionalLight
+use Libraries.Interface.Events.FocusListener
+use Libraries.Interface.Events.FocusEvent
+use Libraries.Interface.Controls.ProgressBar
+
+class Main is Game, FocusListener
+
+    Color color
+    LayoutProperties propertyConstants
+    Model model
+    ProgressBar progressBar = undefined
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        AddFocusListener(me)
+
+        FlowLayout layout
+        SetLayout(layout)
+
+        MenuBar bar
+
+        MenuItem systemItem
+        systemItem:SetName("System")
+        MenuItem openDialogItem
+        openDialogItem:SetName("Open Dialog")
+        MenuItem exitItem
+        exitItem:SetName("Exit")
+
+        OpenDialogBehavior dialogBehavior
+        openDialogItem:SetBehavior(dialogBehavior)
+        ExitBehavior exitBehavior
+        exitItem:SetBehavior(exitBehavior)
+
+        systemItem:Add(openDialogItem)
+        systemItem:Add(exitItem)
+        bar:Add(systemItem)
+
+        MenuItem tabsItem
+        tabsItem:SetName("Tabs")
+        MenuItem firstTabItem
+        firstTabItem:SetName("First Tab")
+        MenuItem secondTabItem
+        secondTabItem:SetName("Second Tab")
+
+        KeyboardEvent keys
+        InputSet control1
+        control1:SetKeyboardInput(keys:NUM_1)
+        control1:AddModifier(control1:CONTROL)
+        InputSet control2
+        control2:SetKeyboardInput(keys:NUM_2)
+        control2:AddModifier(control2:CONTROL)
+
+        firstTabItem:SetShortcut(control1)
+        secondTabItem:SetShortcut(control2)
+
+        tabsItem:Add(firstTabItem)
+        tabsItem:Add(secondTabItem)
+        bar:Add(tabsItem)
+
+        Add(bar)
+
+        ToolBar toolbar
+        toolbar:SetVerticalLayoutMode(propertyConstants:FIT_CONTENTS)
+
+        OutputBehavior outputBehavior
+
+        Button redButton
+        redButton:SetBehavior(outputBehavior)
+        redButton:SetName("Red Button")
+        redButton:SetLeftPadding(4)
+        redButton:SetTopPadding(3)
+        redButton:SetBottomPadding(3)
+        redButton:SetBackgroundColor(color:CustomColor(1, 0.9, 0.9, 1))
+        Button greenButton
+        greenButton:SetBehavior(outputBehavior)
+        greenButton:SetName("Green Button")
+        greenButton:SetLeftPadding(4)
+        greenButton:SetTopPadding(3)
+        greenButton:SetBottomPadding(3)
+        greenButton:SetBackgroundColor(color:CustomColor(0.9, 1, 0.9, 1))
+
+        MakeProgressBarBehavior progressBarBehavior
+        Button progressBarButton
+        progressBarButton:SetBehavior(progressBarBehavior)
+        progressBarButton:SetName("Make Progress Bar")
+        progressBarButton:SetLeftPadding(4)
+        progressBarButton:SetTopPadding(3)
+        progressBarButton:SetBottomPadding(3)
+        progressBarButton:SetBackgroundColor(color:CustomColor(0.9, 0.9, 1, 1))
+
+        toolbar:Add(redButton)
+        toolbar:Add(greenButton)
+        toolbar:Add(progressBarButton)
+
+        Add(toolbar)
+
+        Tree tree
+        tree:SetName("Vehicle Tree")
+
+        TreeItem automobiles
+        automobiles:SetName("Automobiles")
+        tree:Add(automobiles)
+
+        TreeItem cars
+        cars:SetName("Cars")
+        TreeItem sedan
+        sedan:SetName("Sedan")
+        TreeItem convertible
+        convertible:SetName("Convertible")
+        TreeItem limo
+        limo:SetName("Limousine")
+
+        cars:Add(sedan)
+        cars:Add(convertible)
+        cars:Add(limo)
+        automobiles:Add(cars)
+
+        TreeItem ships
+        ships:SetName("Ships")
+        tree:Add(ships)
+
+        TreeItem tanker
+        tanker:SetName("Tanker")
+        TreeItem cruiseShip
+        cruiseShip:SetName("Cruise Ship")
+        TreeItem battleship
+        battleship:SetName("Battleship")
+        TreeItem oldShips
+        oldShips:SetName("Old Ships...")
+
+        TreeItem galleon
+        galleon:SetName("Galleon")
+        TreeItem trireme
+        trireme:SetName("Trireme")
+        TreeItem caravel
+        caravel:SetName("Caravel")
+
+        oldShips:Add(galleon)
+        oldShips:Add(trireme)
+        oldShips:Add(caravel)
+
+        ships:Add(tanker)
+        ships:Add(cruiseShip)
+        ships:Add(battleship)
+        ships:Add(oldShips)
+
+        FlowLayout treeBackgroundLayout
+        Icon treeBackground
+        treeBackground:SetLayout(treeBackgroundLayout)
+        treeBackground:LoadFilledRectangle(1, 1, color:CustomColor(0.9, 0.9, 0.9, 1))
+        treeBackground:SetPercentageWidth(0.48)
+        treeBackground:SetVerticalLayoutMode(propertyConstants:FILL)
+        treeBackground:Add(tree)
+        Add(treeBackground)
+
+        TabPane tabPane
+        tabPane:SetHorizontalLayoutMode(propertyConstants:FILL)
+        tabPane:SetPercentageHeight(0.4)
+
+        Add(tabPane)
+
+        Tab textboxTab
+        textboxTab:SetName("Text Tab")
+        TextBox textBox
+        textBox:SetMoveFocusOnTab(true)
+        textBox:SetPercentageWidth(1)
+        textBox:SetPercentageHeight(1)
+        textboxTab:SetRelatedItem(textBox)
+        
+        tabPane:Add(textboxTab)
+
+        Tab listTab
+        listTab:SetName("List Tab")
+        List list
+        list:Add("Vanilla")
+        list:Add("Chocolate")
+        list:Add("Strawberry")
+        list:Add("Peanut Butter")
+        list:Add("Rocky Road")
+        list:SetPercentageWidth(1)
+        list:SetPercentageHeight(1)
+        listTab:SetRelatedItem(list)
+        tabPane:Add(listTab)
+
+        FocusTabBehavior focusTab1
+        focusTab1:SetTab(textboxTab)
+        firstTabItem:SetBehavior(focusTab1)
+        FocusTabBehavior focusTab2
+        focusTab2:SetTab(listTab)
+        secondTabItem:SetBehavior(focusTab2)
+
+        SetInterfaceScale(2)
+
+        AmbientLight ambience
+        ambience:SetColor(0.4, 0.4, 0.4, 1)
+        SetAmbientLight(ambience)
+
+        DirectionalLight light
+        light:SetColor(0.9, 0.9, 0.9, 1)
+        light:SetDirection(1, -2, 2)
+        Add(light)
+
+        model:LoadBox(1, 1, 1, color:Purple())
+        model:SetPosition(1.5, 0, -2.5)
+
+        // Give the model the CUSTOM accessibility code.
+        model:SetAccessibilityCode(1)
+        model:SetFocusable(true)
+        model:SetName("Cube")
+        model:SetDescription("A purple cube which is slowly spinning about the y-axis.")
+        Add(model)
+
+        redButton:SetNextFocus(greenButton)
+        greenButton:SetNextFocus(progressBarButton)
+        progressBarButton:SetNextFocus(tree)
+        tree:SetNextFocus(tabPane)
+        tabPane:SetNextFocus(model)
+        textBox:SetNextFocus(model)
+        list:SetNextFocus(model)
+        model:SetNextFocus(bar)
+        bar:SetNextFocus(redButton)
+        
+        redButton:SetPreviousFocus(bar)
+        greenButton:SetPreviousFocus(redButton)
+        progressBarButton:SetPreviousFocus(greenButton)
+        tree:SetPreviousFocus(progressBarButton)
+        tabPane:SetPreviousFocus(tree)
+        textBox:SetPreviousFocus(tree)
+        list:SetPreviousFocus(tree)
+        model:SetPreviousFocus(tabPane)
+        bar:SetPreviousFocus(model)
+
+        SetFocus(redButton)
+    end
+
+    action Update(number seconds)
+        model:Rotate(0, 1, 0, 30 * seconds)
+
+        if progressBar not= undefined
+            number newValue = progressBar:GetValue() + 25 * seconds
+            if newValue > progressBar:GetMaximum()
+                Remove(progressBar)
+                progressBar = undefined
+            else
+                progressBar:SetValue(newValue)
+            end
+        end
+    end
+
+    action GainedFocus(FocusEvent event)
+        if event:GetNewFocus() not= undefined
+            output event:GetNewFocus():GetName() + " gained focus."
+        else
+            output "UNDEFINED gained focus."
+        end
+    end
+
+    action ResetProgressBar
+        if progressBar = undefined
+            ProgressBar bar
+            progressBar = bar
+            Add(bar)
+        else
+            progressBar:SetValue(0)
+        end
+    end
+end

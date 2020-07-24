@@ -1,0 +1,9 @@
+{
+    "DevelopmentEnvironmentVersion" : "Quorum Studio 2.0",
+    "ExecutableName" : "Default",
+    "ImageSheetEnabled" : false,
+    "ImageSheetRebuildOnCompile" : false,
+    "Main" : "/SourceCode/Main.quorum",
+    "ProjectName" : "AccessibilityTest",
+    "ProjectType" : "JavaType"
+}

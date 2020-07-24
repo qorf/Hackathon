@@ -1,0 +1,10 @@
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Game.GameStateManager
+
+class ExitBehavior is Behavior
+    action Run(BehaviorEvent event)
+        GameStateManager manager
+        manager:GetGame():Exit()
+    end
+end

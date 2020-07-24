@@ -1,0 +1,12 @@
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Game.GameStateManager
+use Libraries.Interface.AccessibilityManager
+
+class MakeProgressBarBehavior is Behavior
+    action Run(BehaviorEvent event)
+        GameStateManager manager
+        Main main = cast(Main, manager:GetGame())
+        main:ResetProgressBar()
+    end
+end

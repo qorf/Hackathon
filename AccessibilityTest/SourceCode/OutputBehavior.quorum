@@ -1,0 +1,23 @@
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Game.GameStateManager
+use Libraries.Interface.AccessibilityManager
+
+class OutputBehavior is Behavior
+    action Run(BehaviorEvent event)
+        GameStateManager manager
+        AccessibilityManager accessibility = manager:GetAccessibilityManager()
+
+        text result = ""
+        if event:GetItem() not= undefined
+            result = event:GetItem():GetName() + " activated."
+        else
+            result = "Undefined item activated."
+        end
+
+        output result
+        if accessibility not= undefined
+            accessibility:Notify(manager:GetFocus(), result)
+        end
+    end
+end

@@ -1,0 +1,10 @@
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+use Libraries.Interface.Controls.OptionDialog
+
+class OpenDialogBehavior is Behavior
+    action Run(BehaviorEvent event)
+        OptionDialog option
+        option:Show()
+    end
+end
