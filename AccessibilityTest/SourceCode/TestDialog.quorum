@@ -12,6 +12,7 @@ class TestDialog is Dialog
     
     action Setup
         SetName(name)
+        SetModal(true)
         SetPixelWidth(400)
         SetVerticalLayoutMode(parent:Libraries.Interface.Controls.Control:FIT_CONTENTS)
 
