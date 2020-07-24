@@ -1,0 +1,10 @@
+use Libraries.Interface.Behaviors.Behavior
+use Libraries.Interface.Events.BehaviorEvent
+
+class PopupDialogBehavior is Behavior
+    action Run(BehaviorEvent event)
+        TestDialog dialog
+        dialog:Setup()
+        dialog:Show()
+    end
+end

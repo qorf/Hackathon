@@ -87,6 +87,7 @@ class Main is Game, FocusListener
         toolbar:SetVerticalLayoutMode(propertyConstants:FIT_CONTENTS)
 
         OutputBehavior outputBehavior
+        PopupDialogBehavior popupDialogBehavior
 
         Button redButton
         redButton:SetBehavior(outputBehavior)
@@ -96,8 +97,8 @@ class Main is Game, FocusListener
         redButton:SetBottomPadding(3)
         redButton:SetBackgroundColor(color:CustomColor(1, 0.9, 0.9, 1))
         Button greenButton
-        greenButton:SetBehavior(outputBehavior)
-        greenButton:SetName("Green Button")
+        greenButton:SetBehavior(popupDialogBehavior)
+        greenButton:SetName("Green Popup Button")
         greenButton:SetLeftPadding(4)
         greenButton:SetTopPadding(3)
         greenButton:SetBottomPadding(3)

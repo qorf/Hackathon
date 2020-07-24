@@ -1,0 +1,49 @@
+use Libraries.Interface.Controls.Dialog
+use Libraries.Game.Graphics.Label
+use Libraries.Interface.Views.LabelBoxView
+use Libraries.Game.Graphics.Color
+use Libraries.Interface.Layouts.LayoutProperties
+use Libraries.Interface.Layouts.FlowLayout
+use Libraries.Interface.Controls.Button
+
+class TestDialog is Dialog
+    Button button
+    text name = "Test Dialog"
+    
+    action Setup
+        SetName(name)
+        SetPixelWidth(400)
+        SetVerticalLayoutMode(parent:Libraries.Interface.Controls.Control:FIT_CONTENTS)
+
+        LabelBoxView view
+        Color color
+        view:SetBorderThickness(1)
+        view:SetBorderStyle(view:ALL)
+        view:Initialize(color:CustomColor(0.9, 0.9, 0.9, 1), color:Black())
+       
+
+        LayoutProperties properties
+        Control panel
+        FlowLayout findLayout
+
+        button:SetName(name)
+        button:SetFontSize(20)
+        button:SetTopPadding(85)
+        button:SetLeftPadding(40)
+        
+        panel:SetLayout(findLayout)
+        panel:SetPercentageWidth(1.0)
+        panel:SetPixelHeight(140)
+        panel:SetBorderColor(color:Black())
+        panel:SetBorderThickness(1)
+
+        panel:Add(button)
+        panel:SetView2D(view)
+        Add(panel)
+    end
+
+    action OnShow
+        output "Popup Shown"
+        button:Focus()
+    end 
+end
