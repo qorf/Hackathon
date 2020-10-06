@@ -23,6 +23,7 @@ use Libraries.Game.Graphics.DirectionalLight
 use Libraries.Interface.Events.FocusListener
 use Libraries.Interface.Events.FocusEvent
 use Libraries.Interface.Controls.ProgressBar
+use Libraries.Game.DesktopConfiguration
 
 class Main is Game, FocusListener
 
@@ -31,7 +32,15 @@ class Main is Game, FocusListener
     Model model
     ProgressBar progressBar = undefined
 
+    // Boolean values that set how the application handles accessibility and logging information.
+    boolean enableAccessibility = true
+    boolean enableFrameRateCap = true
+    boolean outputFocusChanges = false
+
     action Main
+        DesktopConfiguration configuration = GetDesktopConfiguration()
+        configuration:enableAccessibility = enableAccessibility
+        configuration:limitFramesPerSecond = enableFrameRateCap
         StartGame()
     end
 
@@ -273,10 +282,12 @@ class Main is Game, FocusListener
     end
 
     action GainedFocus(FocusEvent event)
-        if event:GetNewFocus() not= undefined
-            output event:GetNewFocus():GetName() + " gained focus."
-        else
-            output "UNDEFINED gained focus."
+        if outputFocusChanges
+            if event:GetNewFocus() not= undefined
+                output event:GetNewFocus():GetName() + " gained focus."
+            else
+                output "UNDEFINED gained focus."
+            end
         end
     end
 
