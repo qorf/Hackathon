@@ -1,12 +1,12 @@
 use Libraries.Interface.Behaviors.Behavior
 use Libraries.Interface.Events.BehaviorEvent
 use Libraries.Game.GameStateManager
-use Libraries.Interface.AccessibilityManager
+use Libraries.Interface.Accessibility
 
 class OutputBehavior is Behavior
     action Run(BehaviorEvent event)
         GameStateManager manager
-        AccessibilityManager accessibility = manager:GetAccessibilityManager()
+        Accessibility accessibility = manager:GetAccessibility()
 
         text result = ""
         if event:GetItem() not= undefined

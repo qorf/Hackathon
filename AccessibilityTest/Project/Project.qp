@@ -1,9 +1,15 @@
 {
     "DevelopmentEnvironmentVersion" : "Quorum Studio 2.0",
     "ExecutableName" : "Default",
+    "IOS_BUNDLE" : "org.quorumlanguage",
+    "IOS_DEVICE" : "iPhone 12",
+    "IOS_PHYSICAL_DEVICE" : false,
     "ImageSheetEnabled" : false,
     "ImageSheetRebuildOnCompile" : false,
     "Main" : "/SourceCode/Main.quorum",
+    "MobileAssets" : "/media",
+    "JavaClassDependencies" : ["../AccessKitPlugins/build/classes/plugins"],
     "ProjectName" : "AccessibilityTest",
-    "ProjectType" : "JavaType"
+    "ProjectType" : "JavaType",
+    "iosVersion" : "14.2"
 }

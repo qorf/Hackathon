@@ -24,6 +24,7 @@ use Libraries.Interface.Events.FocusListener
 use Libraries.Interface.Events.FocusEvent
 use Libraries.Interface.Controls.ProgressBar
 use Libraries.Game.DesktopConfiguration
+use Libraries.Interface.Accessibility.AccessKitAccessibility
 
 class Main is Game, FocusListener
 
@@ -33,7 +34,7 @@ class Main is Game, FocusListener
     ProgressBar progressBar = undefined
 
     // Boolean values that set how the application handles accessibility and logging information.
-    boolean enableAccessibility = true
+    boolean enableAccessibility = false
     boolean enableFrameRateCap = true
     boolean outputFocusChanges = false
 
@@ -41,6 +42,8 @@ class Main is Game, FocusListener
         DesktopConfiguration configuration = GetDesktopConfiguration()
         configuration:enableAccessibility = enableAccessibility
         configuration:limitFramesPerSecond = enableFrameRateCap
+        AccessKitAccessibility access
+        SetAccessibility(access)
         StartGame()
     end
 
