@@ -23,12 +23,14 @@ use Libraries.Containers.Array
 use Libraries.Game.GameStateManager
 use Libraries.Game.GameDisplay
 use Libraries.Game.Game
+use Libraries.Containers.HashTable
 
 
 class AccessKitAccessibility is Accessibility
-    JavaScriptObjectNotation batch
     boolean firstUpdate = true
     integer rootName = 1
+    HashTable<integer, Item> adds = undefined
+    HashTable<integer, Item> removes = undefined
     
     system action NameChanged(Item item)
 
@@ -37,25 +39,75 @@ class AccessKitAccessibility is Accessibility
     system action TextFieldUpdatePassword(TextField field)
 
     action Update
-    end
-
-    action Setup
-        JavaScriptObjectNotation first
-        
-
-
-        first:SetPrettyPrint(true)
+        JavaScriptObjectNotation note
 
         JavaScriptObjectNotation nodes
         nodes:SetArray()
+
+
+        note:Add("nodes", nodes)
+        if adds not= undefined
+            Iterator<Item> items = adds:GetValueIterator()
+            repeat while items:HasNext() 
+                Item item = items:Next()
+                AddItemToJavaScriptObjectNotation(nodes, item)
+            end
+
+            note:SetPrettyPrint(true)
+            output note:ToText()
+            adds = undefined
+        end
+
         
+    end
 
+    private action AddItemToJavaScriptObjectNotation(JavaScriptObjectNotation note, Item item)
+        JavaScriptObjectNotation node
+        integer id = item:GetHashCode()
+        node:Add("id", id)
+        node:Add("name", item:GetName())
 
+        Array<integer> kids
+        GetChildrenList(kids, item)
+        JavaScriptObjectNotation children = ConvertChildArray(kids)
+        node:Add(children)
         
+        note:Add(node)
+    end
 
+    private action ConvertChildArray(Array<integer> kids) returns JavaScriptObjectNotation
+        JavaScriptObjectNotation note
+        note:SetKey("children")
+        note:SetArray()
+
+        i = 0
+        repeat while i < kids:GetSize()
+            integer hash = kids:Get(i)
+            note:Add(hash)
+            i = i + 1
+        end
+        return note
+    end
+
+    private action GetChildrenList(Array<integer> kids, Item item)
+        i = 0
+        repeat while i < item:GetItemCount()
+            Item kid = item:GetChildAsItem(i)
+            if kid:GetAccessibilityCode() = kid:NOT_ACCESSIBLE
+                GetChildrenList(kids, kid)
+            else
+                integer value = kid:GetHashCode()
+                kids:Add(value)
+            end
+            
+            i = i + 1
+        end
+    end
+
+    private action GenerateWindowNode returns JavaScriptObjectNotation
         JavaScriptObjectNotation windowNode
         windowNode:Add("id", rootName)
-        windowNode:Add("role", "Window")
+        windowNode:Add("role", "window")
 
         GameStateManager gameState
         GameDisplay display = gameState:GetGameDisplay()
@@ -74,8 +126,18 @@ class AccessKitAccessibility is Accessibility
         Game game = gameState:GetGame()
         
         windowNode:Add("name", "Bob")
+        
+        return windowNode
+    end
 
-        nodes:Add(windowNode)
+    action Setup
+        JavaScriptObjectNotation first
+        first:SetPrettyPrint(true)
+
+        JavaScriptObjectNotation nodes
+        nodes:SetArray()
+
+        nodes:Add(GenerateWindowNode())
 
         //Now add the tree and the root stuff.
         JavaScriptObjectNotation tree
@@ -85,7 +147,7 @@ class AccessKitAccessibility is Accessibility
         first:Add("nodes", nodes)
         first:Add("tree", tree)
         first:Add("root", rootName)
-        output first:ToText()
+        
     end
 
     system action ProgressBarValueChanged(ProgressBarValueChangedEvent progress)
@@ -99,12 +161,30 @@ class AccessKitAccessibility is Accessibility
     system action FocusChanged(FocusEvent event)
 
     action Add(Item item) 
-        //JavaScriptObjectNotation notate
         if item:GetAccessibilityCode() not= item:NOT_ACCESSIBLE
-            integer value = item:GetHashCode()
+            if adds = undefined
+                HashTable<integer, Item> adds2
+                adds = adds2
+            end
+    
+    
+            adds:Add(item:GetHashCode(), item)
         end
         
-        AddChildren(item)
+        i = 0
+        repeat while i < item:GetItemCount()
+            Add(item:GetChildAsItem(i))
+            i = i + 1
+        end
+    end
+
+    action Remove(Item item)
+        if removes = undefined
+            HashTable<integer, Item> removes2
+            removes = removes2
+        end
+
+        removes:Add(item:GetHashCode(), item)
     end
 
     private action AddChildren(Item item)
@@ -132,7 +212,7 @@ class AccessKitAccessibility is Accessibility
         end
     end
 
-    system action Remove(Item item)
+    
 
     system action MenuChanged(MenuChangeEvent event)
 
