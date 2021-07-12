@@ -15,16 +15,78 @@ use Libraries.Interface.Controls.ToggleButton
 use Libraries.Interface.Controls.TextField
 use Libraries.Interface.Events.ProgressBarValueChangedEvent
 use Libraries.Interface.Accessibility
+use Libraries.Data.Formats.JavaScriptObjectNotation
+use Libraries.Interface.Item3D
+use Libraries.Containers.Iterator
+use Libraries.Interface.Item2D
+use Libraries.Containers.Array
+use Libraries.Game.GameStateManager
+use Libraries.Game.GameDisplay
+use Libraries.Game.Game
 
 
 class AccessKitAccessibility is Accessibility
+    JavaScriptObjectNotation batch
+    boolean firstUpdate = true
+    integer rootName = 1
+    
     system action NameChanged(Item item)
 
     system action DescriptionChanged(Item item)
 
     system action TextFieldUpdatePassword(TextField field)
 
-    system action Update
+    action Update
+    end
+
+    action Setup
+        JavaScriptObjectNotation first
+        
+
+
+        first:SetPrettyPrint(true)
+
+        JavaScriptObjectNotation nodes
+        nodes:SetArray()
+        
+
+
+        
+
+        JavaScriptObjectNotation windowNode
+        windowNode:Add("id", rootName)
+        windowNode:Add("role", "Window")
+
+        GameStateManager gameState
+        GameDisplay display = gameState:GetGameDisplay()
+        integer width = display:GetWidth()
+        integer height = display:GetHeight()
+
+        JavaScriptObjectNotation bounds
+        JavaScriptObjectNotation rect
+        rect:Add("left",0)
+        rect:Add("top",0)
+        rect:Add("width",width)
+        rect:Add("height",height)
+        bounds:Add("rect", rect)
+        windowNode:Add("bounds", bounds)
+
+        Game game = gameState:GetGame()
+        
+        windowNode:Add("name", "Bob")
+
+        nodes:Add(windowNode)
+
+        //Now add the tree and the root stuff.
+        JavaScriptObjectNotation tree
+        tree:Add("id", "quorum-star-wars-1")
+        tree:Add("sourceStringEncoding", "utf16")
+
+        first:Add("nodes", nodes)
+        first:Add("tree", tree)
+        first:Add("root", rootName)
+        output first:ToText()
+    end
 
     system action ProgressBarValueChanged(ProgressBarValueChangedEvent progress)
 
@@ -36,7 +98,39 @@ class AccessKitAccessibility is Accessibility
 
     system action FocusChanged(FocusEvent event)
 
-    system action Add(Item item) 
+    action Add(Item item) 
+        //JavaScriptObjectNotation notate
+        if item:GetAccessibilityCode() not= item:NOT_ACCESSIBLE
+            integer value = item:GetHashCode()
+        end
+        
+        AddChildren(item)
+    end
+
+    private action AddChildren(Item item)
+        if item is Item2D
+            Item2D temp = cast(Item2D, item)
+            Array<Item2D> children = temp:GetChildren()
+            
+            integer counter = 0
+
+            repeat while counter < children:GetSize()
+                Add(children:Get(counter))
+                counter = counter + 1
+            end
+
+        elseif item is Item3D
+            Item3D temp = cast(Item3D, item)
+            Iterator<Item3D> children = temp:GetItems()
+
+            Item3D child = undefined
+
+            repeat while children:HasNext()
+                child = children:Next()
+                Add(child)
+            end
+        end
+    end
 
     system action Remove(Item item)
 
