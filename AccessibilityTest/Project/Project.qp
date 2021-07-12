@@ -6,10 +6,10 @@
     "IOS_PHYSICAL_DEVICE" : false,
     "ImageSheetEnabled" : false,
     "ImageSheetRebuildOnCompile" : false,
+    "JavaClassDependencies" : ["../AccessKitPlugins/build/classes/plugins"],
     "Main" : "/SourceCode/Main.quorum",
     "MobileAssets" : "/media",
-    "JavaClassDependencies" : ["../AccessKitPlugins/build/classes/plugins"],
     "ProjectName" : "AccessibilityTest",
     "ProjectType" : "JavaType",
-    "iosVersion" : "14.2"
+    "iosVersion" : "14.1"
 }

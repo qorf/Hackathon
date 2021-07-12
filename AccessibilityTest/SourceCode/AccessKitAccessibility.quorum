@@ -27,10 +27,10 @@ use Libraries.Containers.HashTable
 
 
 class AccessKitAccessibility is Accessibility
-    boolean firstUpdate = true
     integer rootName = 1
-    HashTable<integer, Item> adds = undefined
-    HashTable<integer, Item> removes = undefined
+    HashTable<integer, Item> rootItems
+    boolean regenerateRoot = false
+    HashTable<integer, Item> edits
     
     system action NameChanged(Item item)
 
@@ -39,26 +39,35 @@ class AccessKitAccessibility is Accessibility
     system action TextFieldUpdatePassword(TextField field)
 
     action Update
-        JavaScriptObjectNotation note
-
-        JavaScriptObjectNotation nodes
-        nodes:SetArray()
-
-
-        note:Add("nodes", nodes)
-        if adds not= undefined
-            Iterator<Item> items = adds:GetValueIterator()
+        if not edits:IsEmpty()
+            JavaScriptObjectNotation note
+            note:SetPrettyPrint(true)
+    
+            JavaScriptObjectNotation nodes
+            nodes:SetArray()
+    
+            note:Add("nodes", nodes)
+    
+            Iterator<Item> items = edits:GetValueIterator()
             repeat while items:HasNext() 
                 Item item = items:Next()
                 AddItemToJavaScriptObjectNotation(nodes, item)
             end
-
-            note:SetPrettyPrint(true)
+    
+            RegenerateRoot(nodes)
+            
+            edits:Empty()
             output note:ToText()
-            adds = undefined
         end
+    end
 
-        
+    private action RegenerateRoot(JavaScriptObjectNotation nodes)
+        if regenerateRoot
+            JavaScriptObjectNotation rootNode = GenerateWindowNode()
+            nodes:Add(rootNode)
+
+            regenerateRoot = false
+        end
     end
 
     private action AddItemToJavaScriptObjectNotation(JavaScriptObjectNotation note, Item item)
@@ -125,8 +134,19 @@ class AccessKitAccessibility is Accessibility
 
         Game game = gameState:GetGame()
         
-        windowNode:Add("name", "Bob")
-        
+        windowNode:Add("name", game:GetGameName())
+
+        JavaScriptObjectNotation kids
+        kids:SetKey("children")
+        kids:SetArray()
+
+        Iterator<Item> roots = rootItems:GetValueIterator() //we should put these down
+        repeat while roots:HasNext()
+            Item item = roots:Next()
+            kids:Add(item:GetHashCode())
+        end
+
+        windowNode:Add(kids)
         return windowNode
     end
 
@@ -162,13 +182,16 @@ class AccessKitAccessibility is Accessibility
 
     action Add(Item item) 
         if item:GetAccessibilityCode() not= item:NOT_ACCESSIBLE
-            if adds = undefined
-                HashTable<integer, Item> adds2
-                adds = adds2
+            edits:Add(item:GetHashCode(), item)
+
+            Item mom = item:GetAccessibleParent()
+            if mom = undefined //the root is our parent.
+                rootItems:Add(item:GetHashCode(), item)
+                regenerateRoot = true
+            else 
+                edits:Add(mom:GetHashCode(), mom)
             end
-    
-    
-            adds:Add(item:GetHashCode(), item)
+            
         end
         
         i = 0
@@ -179,12 +202,13 @@ class AccessKitAccessibility is Accessibility
     end
 
     action Remove(Item item)
-        if removes = undefined
-            HashTable<integer, Item> removes2
-            removes = removes2
+        Item mom = item:GetAccessibleParent()
+        if mom = undefined //the root is our parent.
+            rootItems:RemoveKey(item:GetHashCode())
+            regenerateRoot = true
+        else 
+            edits:Add(mom:GetHashCode(), mom)
         end
-
-        removes:Add(item:GetHashCode(), item)
     end
 
     private action AddChildren(Item item)
