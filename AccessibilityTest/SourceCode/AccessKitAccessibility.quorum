@@ -24,6 +24,11 @@ use Libraries.Game.GameStateManager
 use Libraries.Game.GameDisplay
 use Libraries.Game.Game
 use Libraries.Containers.HashTable
+use Libraries.Interface.Controls.ProgressBar
+use Libraries.Interface.Controls.MenuItem
+use Libraries.Interface.Controls.TreeItem
+use Libraries.Interface.Controls.TreeTableRow
+use Libraries.Interface.Controls.TreeTableCell
 
 
 class AccessKitAccessibility is Accessibility
@@ -31,12 +36,19 @@ class AccessKitAccessibility is Accessibility
     HashTable<integer, Item> rootItems
     boolean regenerateRoot = false
     HashTable<integer, Item> edits
-    
-    system action NameChanged(Item item)
+    Item focus = undefined
 
-    system action DescriptionChanged(Item item)
+    action NameChanged(Item item)
+        edits:Add(item:GetHashCode(), item)
+    end
 
-    system action TextFieldUpdatePassword(TextField field)
+    action DescriptionChanged(Item item)
+        edits:Add(item:GetHashCode(), item)
+    end
+
+    action TextFieldUpdatePassword(TextField item)
+        edits:Add(item:GetHashCode(), item)
+    end
 
     action Update
         if not edits:IsEmpty()
@@ -57,7 +69,19 @@ class AccessKitAccessibility is Accessibility
             RegenerateRoot(nodes)
             
             edits:Empty()
-            output note:ToText()
+        end
+
+        ChangeFocus()
+    end
+
+    private action ChangeFocus
+        GameStateManager manager
+        Item recent = manager:GetFocus()
+        if recent not= focus
+            JavaScriptObjectNotation tree = GenerateTree()
+            tree:SetPrettyPrint(true)
+            focus = recent
+            output tree:ToText()
         end
     end
 
@@ -160,25 +184,38 @@ class AccessKitAccessibility is Accessibility
         nodes:Add(GenerateWindowNode())
 
         //Now add the tree and the root stuff.
-        JavaScriptObjectNotation tree
-        tree:Add("id", "quorum-star-wars-1")
-        tree:Add("sourceStringEncoding", "utf16")
-
+        JavaScriptObjectNotation tree = GenerateTree()
         first:Add("nodes", nodes)
         first:Add("tree", tree)
         first:Add("root", rootName)
-        
     end
 
-    system action ProgressBarValueChanged(ProgressBarValueChangedEvent progress)
+    private action GenerateTree returns JavaScriptObjectNotation
+        JavaScriptObjectNotation tree
+        tree:Add("id", "quorum-star-wars-1")
+        tree:Add("sourceStringEncoding", "utf16")
+        if focus not= undefined
+            tree:Add("focus", focus:GetHashCode())
+        end
+        return tree        
+    end
+
+    action ProgressBarValueChanged(ProgressBarValueChangedEvent progress)
+        ProgressBar value = progress:GetProgressBar()
+        edits:Add(value:GetHashCode(), value)
+    end
 
     system action SelectionChanged(SelectionEvent event)
 
     system action ButtonActivated(Button button)
 
-    system action ToggleButtonToggled(ToggleButton button)
+    action ToggleButtonToggled(ToggleButton item)
+        edits:Add(item:GetHashCode(), item)
+    end
 
-    system action FocusChanged(FocusEvent event)
+    /* It doesn't make sense, but this isn't called. We update in the update loop instead. */
+    action FocusChanged(FocusEvent event)
+    end
 
     action Add(Item item) 
         if item:GetAccessibilityCode() not= item:NOT_ACCESSIBLE
@@ -238,11 +275,19 @@ class AccessKitAccessibility is Accessibility
 
     
 
-    system action MenuChanged(MenuChangeEvent event)
+    action MenuChanged(MenuChangeEvent event)
+        MenuItem item = event:GetMenuItem()
+        edits:Add(item:GetHashCode(), item)
+    end
 
-    system action TreeChanged(TreeChangeEvent event)
+    action TreeChanged(TreeChangeEvent event)
+        TreeItem item = event:GetTreeItem()
+        edits:Add(item:GetHashCode(), item)
+    end
 
-    system action TreeTableChanged(TreeTableChangeEvent event)
+    action TreeTableChanged(TreeTableChangeEvent event)
+        
+    end
 
     system action ControlActivated(ControlActivationEvent event)
 
