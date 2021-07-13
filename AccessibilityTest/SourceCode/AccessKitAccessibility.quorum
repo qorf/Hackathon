@@ -68,7 +68,7 @@ class AccessKitAccessibility is Accessibility
         roleTable:Add(temp:parent:Item:LIST_ITEM, "listItem")
         roleTable:Add(temp:parent:Item:TREE_TABLE, "treeGrid")
         roleTable:Add(temp:parent:Item:DIALOG, "dialog")
-        roleTable:Add(temp:parent:Item:POPUP_MENU, "menulistPopup")
+        roleTable:Add(temp:parent:Item:POPUP_MENU, "menuListPopup")
         roleTable:Add(temp:parent:Item:PROGRESS_BAR, "progressIndicator")
         roleTable:Add(temp:parent:Item:TREE_TABLE_CELL, "cell")
         roleTable:Add(temp:parent:Item:GROUP, "group")
