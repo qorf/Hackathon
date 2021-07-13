@@ -45,9 +45,9 @@ class AccessKitAccessibility is Accessibility
         // Used to get the accessibility code constants
         Item2D temp
 
-        roleTable:Add(temp:parent:Item:NOT_ACCESSIBLE, "unknown")
-        roleTable:Add(temp:parent:Item:ITEM, "genericContainer")
-        roleTable:Add(temp:parent:Item:CUSTOM, "genericContainer")
+        roleTable:Add(temp:parent:Item:NOT_ACCESSIBLE, "ignored")
+        roleTable:Add(temp:parent:Item:ITEM, "unknown")
+        roleTable:Add(temp:parent:Item:CUSTOM, "unknown")
         roleTable:Add(temp:parent:Item:CHECKBOX, "checkBox")
         roleTable:Add(temp:parent:Item:RADIO_BUTTON, "radioButton")
         roleTable:Add(temp:parent:Item:BUTTON, "button")
