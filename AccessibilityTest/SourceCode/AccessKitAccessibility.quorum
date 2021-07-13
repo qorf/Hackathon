@@ -38,15 +38,63 @@ class AccessKitAccessibility is Accessibility
     HashTable<integer, Item> edits
     Item focus = undefined
 
+    // Used to associate accessibility codes with role values.
+    HashTable<integer, text> roleTable
+
+    on create
+        // Used to get the accessibility code constants
+        Item2D temp
+
+        roleTable:Add(temp:parent:Item:NOT_ACCESSIBLE, "unknown")
+        roleTable:Add(temp:parent:Item:ITEM, "genericcontainer")
+        roleTable:Add(temp:parent:Item:CUSTOM, "genericcontainer")
+        roleTable:Add(temp:parent:Item:CHECKBOX, "checkbox")
+        roleTable:Add(temp:parent:Item:RADIO_BUTTON, "radiobutton")
+        roleTable:Add(temp:parent:Item:BUTTON, "button")
+        roleTable:Add(temp:parent:Item:TOGGLE_BUTTON, "togglebutton")
+        roleTable:Add(temp:parent:Item:TEXTBOX, "inlinetextbox")
+        roleTable:Add(temp:parent:Item:MENU_BAR, "menu")
+        roleTable:Add(temp:parent:Item:MENU_ITEM, "menuitem")
+        roleTable:Add(temp:parent:Item:PANE, "pane")
+        roleTable:Add(temp:parent:Item:TREE, "tree")
+        roleTable:Add(temp:parent:Item:TREE_ITEM, "treeitem")
+        roleTable:Add(temp:parent:Item:TOOLBAR, "toolbar")
+        roleTable:Add(temp:parent:Item:TAB, "tab")
+        roleTable:Add(temp:parent:Item:TAB_PANE, "tabpanel")
+        roleTable:Add(temp:parent:Item:TABLE, "table")
+        roleTable:Add(temp:parent:Item:CELL, "cell")
+        roleTable:Add(temp:parent:Item:TEXT_FIELD, "textfield")
+        roleTable:Add(temp:parent:Item:LIST, "list")
+        roleTable:Add(temp:parent:Item:LIST_ITEM, "listitem")
+        roleTable:Add(temp:parent:Item:TREE_TABLE, "treegrid")
+        roleTable:Add(temp:parent:Item:DIALOG, "dialog")
+        roleTable:Add(temp:parent:Item:POPUP_MENU, "menulistpopup")
+        roleTable:Add(temp:parent:Item:PROGRESS_BAR, "progressindicator")
+        roleTable:Add(temp:parent:Item:TREE_TABLE_CELL, "cell")
+        roleTable:Add(temp:parent:Item:GROUP, "group")
+    end
+
     action NameChanged(Item item)
+        if item:GetAccessibilityCode() = item:NOT_ACCESSIBLE
+            return now
+        end
+
         edits:Add(item:GetHashCode(), item)
     end
 
     action DescriptionChanged(Item item)
+        if item:GetAccessibilityCode() = item:NOT_ACCESSIBLE
+            return now
+        end
+
         edits:Add(item:GetHashCode(), item)
     end
 
     action TextFieldUpdatePassword(TextField item)
+        if item:GetAccessibilityCode() = item:parent:Item:NOT_ACCESSIBLE
+            return now
+        end
+
         edits:Add(item:GetHashCode(), item)
     end
 
@@ -67,6 +115,9 @@ class AccessKitAccessibility is Accessibility
             end
     
             RegenerateRoot(nodes)
+
+            nodes:SetPrettyPrint(true)
+            output nodes:ToText()
             
             edits:Empty()
         end
@@ -98,6 +149,7 @@ class AccessKitAccessibility is Accessibility
         JavaScriptObjectNotation node
         integer id = item:GetHashCode()
         node:Add("id", id)
+        node:Add("role", GetItemRole(item))
         node:Add("name", item:GetName())
 
         Array<integer> kids
@@ -106,6 +158,14 @@ class AccessKitAccessibility is Accessibility
         node:Add(children)
         
         note:Add(node)
+    end
+
+    private action GetItemRole(Item item) returns text
+        if roleTable:HasKey(item:GetAccessibilityCode())
+            return roleTable:GetValue(item:GetAccessibilityCode())
+        end        
+
+        return "unknown"
     end
 
     private action ConvertChildArray(Array<integer> kids) returns JavaScriptObjectNotation
@@ -243,7 +303,7 @@ class AccessKitAccessibility is Accessibility
         if mom = undefined //the root is our parent.
             rootItems:RemoveKey(item:GetHashCode())
             regenerateRoot = true
-        else 
+        else
             edits:Add(mom:GetHashCode(), mom)
         end
     end
