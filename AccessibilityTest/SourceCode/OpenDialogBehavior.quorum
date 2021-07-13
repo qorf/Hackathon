@@ -5,6 +5,8 @@ use Libraries.Interface.Controls.OptionDialog
 class OpenDialogBehavior is Behavior
     action Run(BehaviorEvent event)
         OptionDialog option
+        option:SetModal(false)
         option:Show()
+        option:SetModal(false)
     end
 end
