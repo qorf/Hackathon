@@ -46,30 +46,30 @@ class AccessKitAccessibility is Accessibility
         Item2D temp
 
         roleTable:Add(temp:parent:Item:NOT_ACCESSIBLE, "unknown")
-        roleTable:Add(temp:parent:Item:ITEM, "genericcontainer")
-        roleTable:Add(temp:parent:Item:CUSTOM, "genericcontainer")
-        roleTable:Add(temp:parent:Item:CHECKBOX, "checkbox")
-        roleTable:Add(temp:parent:Item:RADIO_BUTTON, "radiobutton")
+        roleTable:Add(temp:parent:Item:ITEM, "genericContainer")
+        roleTable:Add(temp:parent:Item:CUSTOM, "genericContainer")
+        roleTable:Add(temp:parent:Item:CHECKBOX, "checkBox")
+        roleTable:Add(temp:parent:Item:RADIO_BUTTON, "radioButton")
         roleTable:Add(temp:parent:Item:BUTTON, "button")
-        roleTable:Add(temp:parent:Item:TOGGLE_BUTTON, "togglebutton")
-        roleTable:Add(temp:parent:Item:TEXTBOX, "inlinetextbox")
+        roleTable:Add(temp:parent:Item:TOGGLE_BUTTON, "toggleButton")
+        roleTable:Add(temp:parent:Item:TEXTBOX, "inlineTextBox")
         roleTable:Add(temp:parent:Item:MENU_BAR, "menu")
-        roleTable:Add(temp:parent:Item:MENU_ITEM, "menuitem")
+        roleTable:Add(temp:parent:Item:MENU_ITEM, "menuItem")
         roleTable:Add(temp:parent:Item:PANE, "pane")
         roleTable:Add(temp:parent:Item:TREE, "tree")
-        roleTable:Add(temp:parent:Item:TREE_ITEM, "treeitem")
+        roleTable:Add(temp:parent:Item:TREE_ITEM, "treeItem")
         roleTable:Add(temp:parent:Item:TOOLBAR, "toolbar")
         roleTable:Add(temp:parent:Item:TAB, "tab")
-        roleTable:Add(temp:parent:Item:TAB_PANE, "tabpanel")
+        roleTable:Add(temp:parent:Item:TAB_PANE, "tabPanel")
         roleTable:Add(temp:parent:Item:TABLE, "table")
         roleTable:Add(temp:parent:Item:CELL, "cell")
-        roleTable:Add(temp:parent:Item:TEXT_FIELD, "textfield")
+        roleTable:Add(temp:parent:Item:TEXT_FIELD, "textField")
         roleTable:Add(temp:parent:Item:LIST, "list")
-        roleTable:Add(temp:parent:Item:LIST_ITEM, "listitem")
-        roleTable:Add(temp:parent:Item:TREE_TABLE, "treegrid")
+        roleTable:Add(temp:parent:Item:LIST_ITEM, "listItem")
+        roleTable:Add(temp:parent:Item:TREE_TABLE, "treeGrid")
         roleTable:Add(temp:parent:Item:DIALOG, "dialog")
-        roleTable:Add(temp:parent:Item:POPUP_MENU, "menulistpopup")
-        roleTable:Add(temp:parent:Item:PROGRESS_BAR, "progressindicator")
+        roleTable:Add(temp:parent:Item:POPUP_MENU, "menulistPopup")
+        roleTable:Add(temp:parent:Item:PROGRESS_BAR, "progressIndicator")
         roleTable:Add(temp:parent:Item:TREE_TABLE_CELL, "cell")
         roleTable:Add(temp:parent:Item:GROUP, "group")
     end
@@ -99,14 +99,41 @@ class AccessKitAccessibility is Accessibility
     end
 
     action Update
-        if not edits:IsEmpty()
+        JavaScriptObjectNotation nodes = GenerateNodes()
+
+        JavaScriptObjectNotation focus = GenerateFocus()
+
+        if nodes not= undefined or focus not= undefined
             JavaScriptObjectNotation note
             note:SetPrettyPrint(true)
+
+            if nodes not= undefined 
+                note:Add(nodes)
+            else 
+                JavaScriptObjectNotation nodes2
+                nodes2:SetArray()
+        
+                nodes2:SetKey("nodes")
+                nodes = nodes2
+                note:Add(nodes)
+            end
+
+            if focus not= undefined
+
+                note:Add(focus)
+            end
+
+            output note:ToText()
+        end
+    end
+
+    private action GenerateNodes returns JavaScriptObjectNotation
+        if not edits:IsEmpty()
     
             JavaScriptObjectNotation nodes
             nodes:SetArray()
     
-            note:Add("nodes", nodes)
+            nodes:SetKey("nodes")
     
             Iterator<Item> items = edits:GetValueIterator()
             repeat while items:HasNext() 
@@ -117,23 +144,25 @@ class AccessKitAccessibility is Accessibility
             RegenerateRoot(nodes)
 
             nodes:SetPrettyPrint(true)
-            output nodes:ToText()
+            //output nodes:ToText()
             
             edits:Empty()
+            return nodes
         end
-
-        ChangeFocus()
+        return undefined
     end
 
-    private action ChangeFocus
+    private action GenerateFocus returns JavaScriptObjectNotation
         GameStateManager manager
         Item recent = manager:GetFocus()
         if recent not= focus
             JavaScriptObjectNotation tree = GenerateTree()
             tree:SetPrettyPrint(true)
+            //output tree:ToText()
             focus = recent
-            output tree:ToText()
+            return tree
         end
+        return undefined
     end
 
     private action RegenerateRoot(JavaScriptObjectNotation nodes)
@@ -248,10 +277,14 @@ class AccessKitAccessibility is Accessibility
         first:Add("nodes", nodes)
         first:Add("tree", tree)
         first:Add("root", rootName)
+        
+
+        //output first:ToText()
     end
 
     private action GenerateTree returns JavaScriptObjectNotation
         JavaScriptObjectNotation tree
+        tree:SetKey("tree")
         tree:Add("id", "quorum-star-wars-1")
         tree:Add("sourceStringEncoding", "utf16")
         if focus not= undefined
