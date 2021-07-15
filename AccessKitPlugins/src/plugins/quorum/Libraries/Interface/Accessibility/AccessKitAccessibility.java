@@ -5,6 +5,12 @@
  */
 package plugins.quorum.Libraries.Interface.Accessibility;
 
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import plugins.quorum.Libraries.Game.DesktopDisplay;
+import plugins.quorum.Libraries.Game.GameStateManager;
+import plugins.quorum.Libraries.Interface.AccessibilityManager;
 import quorum.Libraries.Interface.Controls.Button_;
 import quorum.Libraries.Interface.Controls.TextField_;
 import quorum.Libraries.Interface.Controls.ToggleButton_;
@@ -21,6 +27,12 @@ import quorum.Libraries.Interface.Item_;
 
 public class AccessKitAccessibility {
     public java.lang.Object me_ = null;
+    static long macHandle = -1;
+    static {
+            macHandle = org.lwjgl.glfw.GLFWNativeCocoa.glfwGetCocoaWindow(DesktopDisplay.window);
+            String windowTitle = GameStateManager.game.GetDesktopConfiguration().Get_Libraries_Game_DesktopConfiguration__title_();
+
+    }
     public void  NameChanged(Item_ item) {}
 
     public void  DescriptionChanged(Item_ item) {}
