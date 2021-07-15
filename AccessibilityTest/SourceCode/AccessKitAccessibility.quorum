@@ -74,28 +74,24 @@ class AccessKitAccessibility is Accessibility
         roleTable:Add(temp:parent:Item:GROUP, "group")
     end
 
-    action NameChanged(Item item)
-        if item:GetAccessibilityCode() = item:NOT_ACCESSIBLE
+    private action ItemEdited(Item item)
+        if item:GetAccessibilityCode() = item:NOT_ACCESSIBLE or item:IsOnLayer() = false
             return now
         end
 
         edits:Add(item:GetHashCode(), item)
+    end
+
+    action NameChanged(Item item)
+        ItemEdited(item)
     end
 
     action DescriptionChanged(Item item)
-        if item:GetAccessibilityCode() = item:NOT_ACCESSIBLE
-            return now
-        end
-
-        edits:Add(item:GetHashCode(), item)
+        ItemEdited(item)
     end
 
     action TextFieldUpdatePassword(TextField item)
-        if item:GetAccessibilityCode() = item:parent:Item:NOT_ACCESSIBLE
-            return now
-        end
-
-        edits:Add(item:GetHashCode(), item)
+        ItemEdited(item)
     end
 
     action Update
@@ -295,7 +291,7 @@ class AccessKitAccessibility is Accessibility
 
     action ProgressBarValueChanged(ProgressBarValueChangedEvent progress)
         ProgressBar value = progress:GetProgressBar()
-        edits:Add(value:GetHashCode(), value)
+        ItemEdited(value)
     end
 
     system action SelectionChanged(SelectionEvent event)
@@ -303,7 +299,7 @@ class AccessKitAccessibility is Accessibility
     system action ButtonActivated(Button button)
 
     action ToggleButtonToggled(ToggleButton item)
-        edits:Add(item:GetHashCode(), item)
+        ItemEdited(item)
     end
 
     /* It doesn't make sense, but this isn't called. We update in the update loop instead. */
@@ -312,14 +308,14 @@ class AccessKitAccessibility is Accessibility
 
     action Add(Item item) 
         if item:GetAccessibilityCode() not= item:NOT_ACCESSIBLE
-            edits:Add(item:GetHashCode(), item)
+            ItemEdited(item)
 
             Item mom = item:GetAccessibleParent()
             if mom = undefined //the root is our parent.
                 rootItems:Add(item:GetHashCode(), item)
                 regenerateRoot = true
             else 
-                edits:Add(mom:GetHashCode(), mom)
+                ItemEdited(mom)
             end
             
         end
@@ -337,7 +333,7 @@ class AccessKitAccessibility is Accessibility
             rootItems:RemoveKey(item:GetHashCode())
             regenerateRoot = true
         else
-            edits:Add(mom:GetHashCode(), mom)
+            ItemEdited(mom)
         end
     end
 
@@ -370,12 +366,12 @@ class AccessKitAccessibility is Accessibility
 
     action MenuChanged(MenuChangeEvent event)
         MenuItem item = event:GetMenuItem()
-        edits:Add(item:GetHashCode(), item)
+        ItemEdited(item)
     end
 
     action TreeChanged(TreeChangeEvent event)
         TreeItem item = event:GetTreeItem()
-        edits:Add(item:GetHashCode(), item)
+        ItemEdited(item)
     end
 
     action TreeTableChanged(TreeTableChangeEvent event)
