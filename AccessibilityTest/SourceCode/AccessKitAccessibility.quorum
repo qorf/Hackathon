@@ -275,8 +275,11 @@ class AccessKitAccessibility is Accessibility
         first:Add("root", rootName)
         
 
+        SetupNative(first:ToText())
         //output first:ToText()
     end
+
+    private system action SetupNative(text json)
 
     private action GenerateTree returns JavaScriptObjectNotation
         JavaScriptObjectNotation tree

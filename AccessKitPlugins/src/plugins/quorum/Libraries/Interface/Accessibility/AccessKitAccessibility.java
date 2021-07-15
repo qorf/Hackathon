@@ -5,6 +5,7 @@
  */
 package plugins.quorum.Libraries.Interface.Accessibility;
 
+import dev.accesskit.mac.AccessKitMacManager;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,10 +29,15 @@ import quorum.Libraries.Interface.Item_;
 public class AccessKitAccessibility {
     public java.lang.Object me_ = null;
     static long macHandle = -1;
+    AccessKitMacManager kit = null;
     static {
             macHandle = org.lwjgl.glfw.GLFWNativeCocoa.glfwGetCocoaWindow(DesktopDisplay.window);
             String windowTitle = GameStateManager.game.GetDesktopConfiguration().Get_Libraries_Game_DesktopConfiguration__title_();
 
+    }
+    
+    public void SetupNative(String value) {
+        kit = AccessKitMacManager.forNSWindow(macHandle, value);
     }
     public void  NameChanged(Item_ item) {}
 
