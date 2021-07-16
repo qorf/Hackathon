@@ -42,6 +42,7 @@ class Main is Game, FocusListener
         DesktopConfiguration configuration = GetDesktopConfiguration()
         configuration:enableAccessibility = enableAccessibility
         configuration:limitFramesPerSecond = enableFrameRateCap
+        configuration:vSyncEnabled = false
         AccessKitAccessibility access
         SetAccessibility(access)
         StartGame()

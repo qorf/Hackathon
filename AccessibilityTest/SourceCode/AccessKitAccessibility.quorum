@@ -29,6 +29,8 @@ use Libraries.Interface.Controls.MenuItem
 use Libraries.Interface.Controls.TreeItem
 use Libraries.Interface.Controls.TreeTableRow
 use Libraries.Interface.Controls.TreeTableCell
+use Libraries.Game.DesktopDisplay
+use Libraries.Game.Shapes.Rectangle
 
 
 class AccessKitAccessibility is Accessibility
@@ -119,9 +121,14 @@ class AccessKitAccessibility is Accessibility
                 note:Add(focus)
             end
 
+
+            note:SetPrettyPrint(true)
             output note:ToText()
+            UpdateNative(note:ToText())
         end
     end
+
+    private system action UpdateNative(text json)
 
     private action GenerateNodes returns JavaScriptObjectNotation
         if not edits:IsEmpty()
@@ -170,12 +177,63 @@ class AccessKitAccessibility is Accessibility
         end
     end
 
+    private action GetBoundingRectangle(Item item) returns JavaScriptObjectNotation
+        JavaScriptObjectNotation bounds
+        bounds:SetKey("bounds")
+
+        number left = 0
+        number top = 0
+        number width = 0
+        number height = 0
+
+        GameStateManager manager
+        GameDisplay gd = manager:GetGameDisplay()
+        if gd not= undefined and gd is DesktopDisplay
+            DesktopDisplay display = cast(DesktopDisplay, gd)
+            number windowX = display:GetDisplayX()
+            number windowY = display:GetDisplayY()
+            number windowHeight = display:GetHeight()
+    
+            if item is Item2D
+                Item2D i2 = cast(Item2D, item)
+                number itemX = i2:GetScreenX()
+                number itemY = i2:GetScreenY()
+                //output "Name: " + item:GetName() + "x: " + itemX + ", y: " + itemY
+                if not itemX:IsNotANumber() and not itemY:IsNotANumber()
+                    left = windowX + itemX
+                    top = windowY + (windowHeight - (itemY + i2:GetHeight()))
+                    width = i2:GetWidth()
+                    height = i2:GetHeight()
+                end
+            elseif item is Item3D
+                Item3D i3 = cast(Item3D, item)
+                Rectangle rectangle = i3:GetScreenBounds()
+                top = windowX + rectangle:GetX()
+                left = windowY + (windowHeight - (rectangle:GetY() + rectangle:GetHeight()))
+                width = rectangle:GetWidth()
+                height = rectangle:GetHeight()
+            end
+
+        end
+
+        JavaScriptObjectNotation rect
+        rect:Add("left", left)
+        rect:Add("top", top)
+        rect:Add("width", width)
+        rect:Add("height", height)
+
+        bounds:Add("rect", rect)
+        return bounds
+    end
+
     private action AddItemToJavaScriptObjectNotation(JavaScriptObjectNotation note, Item item)
         JavaScriptObjectNotation node
         integer id = item:GetHashCode()
         node:Add("id", id)
         node:Add("role", GetItemRole(item))
         node:Add("name", item:GetName())
+
+        node:Add(GetBoundingRectangle(item))
 
         Array<integer> kids
         GetChildrenList(kids, item)
@@ -255,7 +313,9 @@ class AccessKitAccessibility is Accessibility
             kids:Add(item:GetHashCode())
         end
 
-        windowNode:Add(kids)
+        //windowNode:Add(kids)
+        //windowNode:SetPrettyPrint(true)
+        //output windowNode:ToText()
         return windowNode
     end
 
@@ -271,12 +331,12 @@ class AccessKitAccessibility is Accessibility
         //Now add the tree and the root stuff.
         JavaScriptObjectNotation tree = GenerateTree()
         first:Add("nodes", nodes)
-        first:Add("tree", tree)
+        first:Add(tree)
         first:Add("root", rootName)
         
-
-        SetupNative(first:ToText())
         //output first:ToText()
+        SetupNative(first:ToText())
+        output "Setup"
     end
 
     private system action SetupNative(text json)
